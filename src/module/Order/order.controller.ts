@@ -32,6 +32,27 @@ const createOrder = catchAsync(async (req, res) => {
   });
 });
 
+const calculateRevenue = catchAsync(async (req, res) => {
+  const revenue = await Order.aggregate([
+    {
+      $group: {
+        _id: null,
+        amount: {
+          $sum: '$totalPrice',
+        },
+      },
+    },
+    { $project: { amount: 1 } },
+  ]);
+
+  res.status(200).json({
+    success: true,
+    message: 'Revenue calculated successfully',
+    data: { totalRevenue: revenue[0].amount },
+  });
+});
+
 export const OrderController = {
   createOrder,
+  calculateRevenue,
 };
